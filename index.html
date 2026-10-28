@@ -130,11 +130,9 @@ var n=f.name.value.trim(),p=f.phone.value.trim(),e=f.email.value.trim();
 if(!n||p.replace(/\D/g,'').length<9||!/^\S+@\S+\.\S+$/.test(e)){say('Перевірте, будь ласка, ім’я, телефон та email.',false);return}
 b.disabled=true;say('Надсилаємо…',true);
 try{
-var db=await window.claude.use('db');
-if(!db)throw new Error('nodb');
-var id='l'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-await db.collection('leads').doc(id).set({name:n,phone:p,email:e,createdAt:new Date().toISOString()});
-f.reset();say('Дякуємо! Заявку отримано, ми зв’яжемося з вами найближчим часом.',true);
+var r=await fetch('https://formspree.io/f/xwllbzdg',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({name:n,phone:p,email:e,_subject:'Нова заявка — De Costa Group'})});
+if(!r.ok)throw new Error('send');
+f.reset();say('Дякуємо! Заявку отримано, ми зв’яжемося з вами найближчим часом.',true);b.disabled=false;
 }catch(err){say('Не вдалося надіслати заявку. Спробуйте ще раз пізніше.',false);b.disabled=false;}
 });
 })();
